@@ -1,0 +1,282 @@
+@model GiuaKi.Exams.ExamWithQuestionsDto
+@{
+    ViewBag.Title = "Kết quả bài thi - EduTest";
+    var userAnswers = ViewBag.UserAnswers as Dictionary<string, string> ?? new Dictionary<string, string>();
+    string scoreStr = TempData["Score"] as string ?? "8.0";
+    int correctCount = (int)(TempData["CorrectCount"] ?? 0);
+    int wrongCount = (int)(TempData["WrongCount"] ?? 0);
+    int skippedCount = (int)(TempData["SkippedCount"] ?? 0);
+    int totalCount = (int)(TempData["TotalCount"] ?? (Model?.Questions?.Count ?? 0));
+    string timeSpent = TempData["TimeSpent"] as string ?? "25m 14s";
+    string examTitle = TempData["ExamTitle"] as string ?? (Model?.Name ?? "Bài thi trắc nghiệm TOEIC");
+
+    // Tính tỷ lệ đúng theo thang 100 cho SVG ring
+    double scoreVal = double.TryParse(scoreStr, out var s) ? s : 8.0;
+    double percentage = (scoreVal / 10.0) * 100;
+    double dashOffset = 283 - (283 * (percentage / 100));
+}
+
+<style>
+    .result-container-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px 16px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    /* Score Ring SVG chuẩn Figma */
+    .score-ring-wrapper {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        margin: 0 auto 20px auto;
+    }
+
+    .score-ring-svg {
+        transform: rotate(-90deg);
+        width: 100%;
+        height: 100%;
+    }
+
+    .ring-bg {
+        fill: none;
+        stroke: #F1F5F9;
+        stroke-width: 8;
+    }
+
+    .ring-val {
+        fill: none;
+        stroke: var(--primary);
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-dasharray: 283;
+        transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    .ring-center-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .ring-score-big {
+        font-size: 38px;
+        font-weight: 800;
+        color: var(--text-main);
+        line-height: 1;
+    }
+
+    .ring-score-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-weight: 600;
+    }
+
+    .result-exam-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+    .result-exam-sub {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+    }
+
+    /* Stats Grid */
+    .stats-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        max-width: 700px;
+        margin: 0 auto 28px auto;
+    }
+
+    .stat-box-card {
+        background: #F8FAFC;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px 12px;
+    }
+
+    .stat-val-num {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .stat-lbl-title {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .result-action-btns {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+    }
+
+    .btn-return-catalog {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary);
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-return-catalog:hover {
+        background: var(--primary-hover);
+        color: #FFFFFF;
+    }
+
+    /* Answer Review Cards */
+    .review-card-item {
+        background: #FFFFFF;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 14px;
+        text-align: left;
+    }
+
+    .review-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+
+    .pill-correct {
+        background: #D1FAE5;
+        color: #059669;
+    }
+
+    .pill-wrong {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .pill-skipped {
+        background: #F1F5F9;
+        color: #64748B;
+    }
+</style>
+
+<div class="result-container-card">
+    <!-- Vòng tròn điểm số (Score Ring) -->
+    <div class="score-ring-wrapper">
+        <svg class="score-ring-svg" viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="45"></circle>
+            <circle class="ring-val" cx="50" cy="50" r="45" style="stroke-dashoffset: @dashOffset;"></circle>
+        </svg>
+        <div class="ring-center-text">
+            <div class="ring-score-big">@scoreStr</div>
+            <div class="ring-score-sub">Thang điểm 10</div>
+        </div>
+    </div>
+
+    <h2 class="result-exam-title">@examTitle</h2>
+    <p class="result-exam-sub">Thời gian làm bài: @timeSpent · Tổng số @totalCount câu</p>
+
+    <!-- 4 Khung thống kê Đúng / Sai / Bỏ qua / Tổng -->
+    <div class="stats-summary-grid">
+        <div class="stat-box-card">
+            <div class="stat-val-num" style="color: #059669;">@correctCount</div>
+            <div class="stat-lbl-title">Câu đúng</div>
+        </div>
+        <div class="stat-box-card">
+            <div class="stat-val-num" style="color: #DC2626;">@wrongCount</div>
+            <div class="stat-lbl-title">Câu sai</div>
+        </div>
+        <div class="stat-box-card">
+            <div class="stat-val-num" style="color: #64748B;">@skippedCount</div>
+            <div class="stat-lbl-title">Chưa làm</div>
+        </div>
+        <div class="stat-box-card">
+            <div class="stat-val-num" style="color: var(--primary);">@timeSpent</div>
+            <div class="stat-lbl-title">Thời gian</div>
+        </div>
+    </div>
+
+    <div class="result-action-btns">
+        <a href="@Url.Action("Catalog", "Student")" class="btn-return-catalog">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Chọn bài thi khác</span>
+        </a>
+        @if (Model != null)
+        {
+            <a href="@Url.Action("Room", "Student", new { id = Model.Id })" class="btn-return-catalog" style="background: #F1F5F9; color: var(--text-main);">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Làm lại bài này</span>
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Xem lại chi tiết đáp án từng câu -->
+<h3 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Xem lại bài làm chi tiết</h3>
+
+@if (Model?.Questions != null && Model.Questions.Any())
+{
+    @foreach (var q in Model.Questions)
+    {
+        string qKey = q.QuestionNumber.ToString();
+        string userAns = userAnswers.ContainsKey(qKey) ? userAnswers[qKey] : "";
+        bool isCorrect = string.Equals(userAns.Trim(), q.CorrectAnswer?.Trim(), StringComparison.OrdinalIgnoreCase);
+        bool isSkipped = string.IsNullOrEmpty(userAns);
+
+        <div class="review-card-item">
+            @if (isCorrect)
+            {
+                <span class="review-status-pill pill-correct">
+                    <i class="fa-solid fa-check"></i> Câu @q.QuestionNumber: Chính xác
+                </span>
+            }
+            else if (isSkipped)
+            {
+                <span class="review-status-pill pill-skipped">
+                    <i class="fa-solid fa-minus"></i> Câu @q.QuestionNumber: Chưa làm
+                </span>
+            }
+            else
+            {
+                <span class="review-status-pill pill-wrong">
+                    <i class="fa-solid fa-xmark"></i> Câu @q.QuestionNumber: Chưa đúng
+                </span>
+            }
+
+            <p style="font-size: 14.5px; font-weight: 600; color: var(--text-main); margin-bottom: 12px;">@(q.Content?.Replace("[BLANK]", "________"))</p>
+
+            <div style="font-size: 13.5px; line-height: 1.8; color: #475569;">
+                <div><strong>A:</strong> @q.OptionA</div>
+                <div><strong>B:</strong> @q.OptionB</div>
+                <div><strong>C:</strong> @q.OptionC</div>
+                <div><strong>D:</strong> @q.OptionD</div>
+            </div>
+
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #F1F5F9; font-size: 13px; display: flex; gap: 20px;">
+                <div>Bạn chọn: <strong>@(string.IsNullOrEmpty(userAns) ? "Chưa chọn" : userAns)</strong></div>
+                <div style="color: #059669;">Đáp án đúng: <strong>@q.CorrectAnswer</strong></div>
+            </div>
+        </div>
+    }
+}
+

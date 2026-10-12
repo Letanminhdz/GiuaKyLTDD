@@ -1,0 +1,626 @@
+@model List<GiuaKi.Exams.ExamDto>
+@{
+    ViewBag.Title = "Import đề thi - EduTest Admin";
+    var errorMsg = TempData["Error"] as string;
+    var successMsg = TempData["Success"] as string;
+}
+
+<style>
+    .page-header-block {
+        margin-bottom: 28px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .grid-two-cards {
+        display: grid;
+        grid-template-columns: 1.6fr 1.2fr;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+    .figma-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .card-top-tag {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .step-badge {
+        font-size: 11px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .file-type-pill {
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748B;
+        background: #F1F5F9;
+        padding: 3px 8px;
+        border-radius: 6px;
+    }
+
+    .card-heading {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+    .card-subheading {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+    /* Drag Drop Area khớp Figma */
+    .dropzone-box {
+        border: 2px dashed #CBD5E1;
+        border-radius: 12px;
+        background: #F8FAFC;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+    }
+
+    .dropzone-box:hover {
+        border-color: var(--primary);
+        background: #F5F3FF;
+    }
+
+    .upload-icon-circle {
+        width: 52px;
+        height: 52px;
+        background: var(--primary-light);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin: 0 auto 16px auto;
+    }
+
+    .drop-text-primary {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+
+    .drop-text-secondary {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+    }
+
+    .btn-choose-file {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary);
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 22px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .btn-choose-file:hover {
+        background: var(--primary-hover);
+    }
+
+    .drop-hint {
+        font-size: 11px;
+        color: #94A3B8;
+        margin-top: 14px;
+    }
+
+    /* Guide list */
+    .guide-step-item {
+        display: flex;
+        gap: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid #F1F5F9;
+    }
+
+    .guide-step-item:last-child {
+        border-bottom: none;
+    }
+
+    .step-number {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+        min-width: 20px;
+    }
+
+    .step-content h5 {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 2px;
+    }
+
+    .step-content p {
+        font-size: 12.5px;
+        color: var(--text-muted);
+    }
+
+    .btn-download-sample {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-top: 18px;
+        padding: 8px 14px;
+        border-radius: 6px;
+        background: var(--primary-light);
+        transition: opacity 0.15s;
+    }
+
+    .btn-download-sample:hover {
+        opacity: 0.9;
+    }
+
+    /* Error Validation Area khớp Figma Image 2 */
+    .validation-card {
+        background: #FFFFFF;
+        border: 1px solid #FEE2E2;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+
+    .file-item-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #F8FAFC;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+    }
+
+    .file-info-group {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .file-docx-icon {
+        font-size: 26px;
+        color: var(--primary);
+    }
+
+    .file-name-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .file-meta-text {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .badge-error-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #FEE2E2;
+        color: #DC2626;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .badge-success-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #D1FAE5;
+        color: #059669;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .error-alert-box {
+        background: #FEF2F2;
+        border: 1px solid #FECACA;
+        border-radius: 10px;
+        padding: 18px 20px;
+    }
+
+    .alert-header-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .alert-header-row i {
+        color: #DC2626;
+        font-size: 18px;
+    }
+
+    .alert-header-row strong {
+        font-size: 15px;
+        color: #991B1B;
+    }
+
+    .alert-header-row span {
+        font-size: 13px;
+        color: #B91C1C;
+        margin-left: 8px;
+    }
+
+    .error-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #FFFFFF;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #FEE2E2;
+        margin-bottom: 14px;
+    }
+
+    .error-table td {
+        padding: 10px 16px;
+        font-size: 13px;
+        border-bottom: 1px solid #FEE2E2;
+    }
+
+    .error-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .error-table .col-pos {
+        font-weight: 600;
+        color: #DC2626;
+        width: 140px;
+    }
+
+    .error-table .col-msg {
+        color: #475569;
+    }
+
+    .alert-footer-note {
+        font-size: 12px;
+        color: #059669;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Kho đề thi Table */
+    .exam-list-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
+
+    .exam-list-table th {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .exam-list-table td {
+        padding: 16px;
+        font-size: 14px;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .exam-title-cell {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .action-btn-edit {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 6px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .action-btn-edit:hover {
+        background: #DDD6FE;
+    }
+
+    .action-btn-delete {
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: #FEE2E2;
+        color: #DC2626;
+        border: none;
+        font-size: 13px;
+        cursor: pointer;
+        margin-left: 6px;
+        transition: background 0.15s;
+    }
+
+    .action-btn-delete:hover {
+        background: #FECACA;
+    }
+</style>
+
+<div class="page-header-block">
+    <h1 class="page-title">Import đề thi</h1>
+    <p class="page-subtitle">Tải lên và kiểm tra cấu trúc đề thi trước khi xuất bản.</p>
+</div>
+
+<!-- 2 Cột trên: Bước 1 Upload & Hướng dẫn (Chuẩn Figma) -->
+<div class="grid-two-cards">
+    <!-- Card Bước 1: Upload File Word -->
+    <div class="figma-card">
+        <div class="card-top-tag">
+            <span class="step-badge">BƯỚC 1</span>
+            <span class="file-type-pill">DOCX</span>
+        </div>
+        <h3 class="card-heading">Tải tệp đề thi</h3>
+        <p class="card-subheading">Kéo thả tệp Word (.docx) chứa nội dung đề thi TOEIC đã định dạng chuẩn vào ô dưới.</p>
+
+        <form id="uploadForm" asp-controller="Exam" asp-action="UploadWordFile" method="post" enctype="multipart/form-data">
+            <input type="file" id="docxFileInput" name="file" accept=".docx" style="display:none;" onchange="handleFileSelected(this)" required />
+            
+            <div class="dropzone-box" onclick="document.getElementById('docxFileInput').click()" ondragover="event.preventDefault()" ondrop="handleFileDrop(event)">
+                <div class="upload-icon-circle">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                </div>
+                <div class="drop-text-primary" id="dropzoneLabel">Kéo thả tệp vào đây</div>
+                <div class="drop-text-secondary" id="dropzoneSubLabel">hoặc chọn tệp từ máy tính của bạn</div>
+                <button type="button" class="btn-choose-file">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                    <span>Chọn tệp .docx</span>
+                </button>
+                <div class="drop-hint">Dung lượng tối đa 10 MB · Định dạng Microsoft Word (.docx)</div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Card Hướng dẫn: Chuẩn định dạng (Chuẩn Figma) -->
+    <div class="figma-card">
+        <div class="card-top-tag">
+            <span class="step-badge">HƯỚNG DẪN</span>
+        </div>
+        <h3 class="card-heading">Chuẩn định dạng</h3>
+        <p class="card-subheading">Đảm bảo tệp của bạn tuân thủ đúng cấu trúc để hệ thống có thể đọc chính xác.</p>
+
+        <div class="guide-steps-list">
+            <div class="guide-step-item">
+                <span class="step-number">01</span>
+                <div class="step-content">
+                    <h5>Đánh số liên tục</h5>
+                    <p>Câu 1, Câu 2... không ngắt quãng trong toàn bộ đề thi.</p>
+                </div>
+            </div>
+            <div class="guide-step-item">
+                <span class="step-number">02</span>
+                <div class="step-content">
+                    <h5>Đủ bốn đáp án</h5>
+                    <p>Mỗi câu trắc nghiệm gồm 4 lựa chọn [A], [B], [C] và [D].</p>
+                </div>
+            </div>
+            <div class="guide-step-item">
+                <span class="step-number">03</span>
+                <div class="step-content">
+                    <h5>Đánh dấu đáp án</h5>
+                    <p>Thêm tag [ANSWER: A/B/C/D] rõ ràng ở cuối mỗi câu hỏi.</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="@Url.Action("DownloadSample", "Exam")" class="btn-download-sample">
+            <i class="fa-regular fa-file-word"></i>
+            <span>Tải tệp mẫu chuẩn</span>
+        </a>
+    </div>
+</div>
+
+<!-- KHU VỰC THÔNG BÁO LỖI (Khớp 100% Khung Đỏ Figma Image 2) -->
+@if (!string.IsNullOrEmpty(errorMsg))
+{
+    <div class="validation-card">
+        <div class="file-item-bar">
+            <div class="file-info-group">
+                <i class="fa-regular fa-file-word file-docx-icon"></i>
+                <div>
+                    <div class="file-name-text">tep-de-thi.docx</div>
+                    <div class="file-meta-text">Phát hiện lỗi định dạng</div>
+                </div>
+            </div>
+            <span class="badge-error-pill">
+                <i class="fa-solid fa-triangle-exclamation"></i> Có lỗi
+            </span>
+        </div>
+
+        <div class="error-alert-box">
+            <div class="alert-header-row">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <strong>Không thể import đề thi</strong>
+                <span>Vui lòng sửa các lỗi dưới đây và tải lại tệp.</span>
+            </div>
+
+            <table class="error-table">
+                <tbody>
+                    @{
+                        var lines = errorMsg.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var line in lines)
+                        {
+                            var parts = line.Split(new[] { ':' }, 2);
+                            if (parts.Length == 2)
+                            {
+                                <tr>
+                                    <td class="col-pos">@parts[0].Trim()</td>
+                                    <td class="col-msg">@parts[1].Trim()</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="col-pos">Chi tiết</td>
+                                    <td class="col-msg">@line</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="alert-footer-note">
+                <i class="fa-solid fa-check"></i>
+                <span>Dữ liệu chưa được lưu. Hệ thống chỉ lưu đề thi khi tệp đạt 100% tiêu chuẩn.</span>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- KHU VỰC THÔNG BÁO THÀNH CÔNG -->
+@if (!string.IsNullOrEmpty(successMsg))
+{
+    <div class="validation-card" style="border-color: #A7F3D0;">
+        <div class="file-item-bar" style="background: #F0FDF4; border-color: #BBF7D0;">
+            <div class="file-info-group">
+                <i class="fa-regular fa-file-word file-docx-icon" style="color: #059669;"></i>
+                <div>
+                    <div class="file-name-text">Import thành công!</div>
+                    <div class="file-meta-text" style="color: #047857;">@successMsg</div>
+                </div>
+            </div>
+            <span class="badge-success-pill">
+                <i class="fa-solid fa-circle-check"></i> Hợp lệ 100%
+            </span>
+        </div>
+    </div>
+}
+
+<!-- Kho đề thi đã import (Quản lý đề) -->
+<div class="figma-card" id="exam-list" style="margin-top: 12px;">
+    <div class="card-top-tag">
+        <span class="step-badge">KHO ĐỀ THI</span>
+        <span class="file-type-pill">@(Model?.Count ?? 0) đề khả dụng</span>
+    </div>
+    <h3 class="card-heading">Danh sách đề thi đã import</h3>
+    <p class="card-subheading">Các đề thi đã được kiểm tra tính hợp lệ và sẵn sàng cho học viên làm bài trên Mobile.</p>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="exam-list-table">
+            <thead>
+                <tr>
+                    <th>Tên đề thi</th>
+                    <th>Thời gian</th>
+                    <th>Số câu hỏi</th>
+                    <th style="text-align: right;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var exam in Model)
+                {
+                    <tr>
+                        <td class="exam-title-cell">@exam.Name</td>
+                        <td>
+                            <span style="background: #F1F5F9; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 500;">
+                                <i class="fa-regular fa-clock" style="margin-right: 4px; color: #64748B;"></i>
+                                @exam.DurationInMinutes phút
+                            </span>
+                        </td>
+                        <td>
+                            <span style="background: #F1F5F9; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 500;">
+                                <i class="fa-regular fa-circle-question" style="margin-right: 4px; color: #64748B;"></i>
+                                @exam.TotalQuestions câu
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="@Url.Action("Edit", "Exam", new { id = exam.Id })" class="action-btn-edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                <span>Sửa nội dung</span>
+                            </a>
+                            <form asp-controller="Exam" asp-action="Delete" asp-route-id="@exam.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa đề thi này?');">
+                                <button type="submit" class="action-btn-delete" title="Xóa đề thi">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="padding: 36px 20px; text-align: center; color: var(--text-muted);">
+            <i class="fa-regular fa-folder-open" style="font-size: 40px; color: #CBD5E1; margin-bottom: 12px; display: block;"></i>
+            <p style="font-size: 14px;">Chưa có đề thi nào trong kho. Hãy tải tệp Word bên trên để import đề thi đầu tiên!</p>
+        </div>
+    }
+</div>
+
+<script>
+    function handleFileSelected(input) {
+        if (input.files && input.files[0]) {
+            const fileName = input.files[0].name;
+            document.getElementById('dropzoneLabel').textContent = fileName;
+            document.getElementById('dropzoneSubLabel').textContent = 'Đang tiến hành tải lên & kiểm tra cấu trúc...';
+            document.getElementById('uploadForm').submit();
+        }
+    }
+
+    function handleFileDrop(e) {
+        e.preventDefault();
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const fileInput = document.getElementById('docxFileInput');
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelected(fileInput);
+        }
+    }
+</script>

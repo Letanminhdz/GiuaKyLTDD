@@ -1,0 +1,40 @@
+# Root .gitignore for GiuaKi TOEIC Exam Project
+
+# Visual Studio / .NET
+.vs/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Dd]ebug/
+**/[Rr]elease/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.pdb
+*.cache
+appsettings.Production.json
+
+# Flutter / Dart
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/coverage/
+frontend/**/doc/api/
+frontend/**/ios/Flutter/.last_build_id
+frontend/android/app/debug/
+frontend/android/app/profile/
+frontend/android/app/release/
+frontend/.widget_preview/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+*.swp
+*~

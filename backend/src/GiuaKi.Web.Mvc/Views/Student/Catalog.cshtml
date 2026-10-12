@@ -1,0 +1,409 @@
+@model List<GiuaKi.Exams.ExamDto>
+@{
+    ViewBag.Title = "Đề thi của bạn - EduTest Mobile";
+    var activeExam = Model?.FirstOrDefault();
+}
+
+<style>
+    /* Welcome Banner chuẩn Figma */
+    .figma-welcome-banner {
+        background: linear-gradient(135deg, #5A4FCF 0%, #6E62E5 100%);
+        border-radius: 20px;
+        padding: 20px 22px;
+        color: #FFFFFF;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        box-shadow: 0 10px 25px rgba(90, 79, 207, 0.22);
+    }
+
+    .banner-left {
+        flex: 1;
+        padding-right: 14px;
+    }
+
+    .banner-pill-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        color: #FFFFFF;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-bottom: 8px;
+    }
+
+    .banner-main-title {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        line-height: 1.25;
+    }
+
+    .banner-subtext {
+        font-size: 11.5px;
+        opacity: 0.9;
+        line-height: 1.4;
+    }
+
+    .banner-score-divider {
+        border-left: 1px solid rgba(255, 255, 255, 0.22);
+        padding-left: 18px;
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .banner-score-number {
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .banner-score-caption {
+        font-size: 10px;
+        opacity: 0.85;
+        margin-top: 5px;
+        white-space: nowrap;
+    }
+
+    /* Section Header */
+    .figma-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .section-title-text {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1E293B;
+    }
+
+    .section-sub-count {
+        font-size: 12px;
+        color: #64748B;
+        margin-top: 2px;
+    }
+
+    .section-icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
+        background: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748B;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    /* Figma Exam Card Styling */
+    .figma-exam-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 18px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-accent-bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4.5px;
+    }
+
+    .card-accent-purple { background: #5A4FCF; }
+    .card-accent-blue { background: #3B82F6; }
+    .card-accent-orange { background: #F59E0B; }
+
+    .card-header-flex {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .subject-icon-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .avatar-purple { background: #EDE9FE; color: #5A4FCF; }
+    .avatar-blue { background: #DBEAFE; color: #2563EB; }
+    .avatar-orange { background: #FEF3C7; color: #D97706; }
+
+    .card-text-block {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .subject-category-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
+    .category-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .cat-purple { color: #5A4FCF; }
+    .cat-blue { color: #2563EB; }
+    .cat-orange { color: #D97706; }
+
+    .badge-open-tag {
+        background: #D1FAE5;
+        color: #059669;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .exam-title-h4 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1E293B;
+        line-height: 1.35;
+        margin-bottom: 4px;
+    }
+
+    .exam-code-sub {
+        font-size: 12px;
+        color: #64748B;
+    }
+
+    /* 3 Facts Row (Thời gian | Số câu | Ngày) */
+    .card-facts-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 4px;
+        border-top: 1px solid #F1F5F9;
+        border-bottom: 1px solid #F1F5F9;
+        font-size: 12px;
+        color: #475569;
+        margin-bottom: 14px;
+    }
+
+    .fact-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .fact-item i {
+        color: #94A3B8;
+        font-size: 13px;
+    }
+
+    /* Buttons */
+    .btn-card-primary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        background: #5A4FCF;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: background 0.15s, transform 0.1s;
+        box-shadow: 0 4px 12px rgba(90, 79, 207, 0.2);
+    }
+
+    .btn-card-primary:hover {
+        background: #483EA8;
+        color: #FFFFFF;
+        transform: translateY(-1px);
+    }
+
+    .btn-card-outline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 11px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+
+    .btn-card-outline:hover {
+        background: #F8FAFC;
+        border-color: #CBD5E1;
+        color: #1E293B;
+    }
+</style>
+
+<!-- 1. Banner chào đón khớp Figma -->
+<div class="figma-welcome-banner">
+    <div class="banner-left">
+        <span class="banner-pill-badge">Tiếp tục cố gắng</span>
+        <h2 class="banner-main-title">Sẵn sàng cho bài thi?</h2>
+        <p class="banner-subtext">Bạn có các bài thi sắp đến hạn trong tuần này.</p>
+    </div>
+    <div class="banner-score-divider">
+        <div class="banner-score-number">8.6</div>
+        <div class="banner-score-caption">Điểm trung bình</div>
+    </div>
+</div>
+
+<!-- 2. Tiêu đề mục -->
+<div class="figma-section-header">
+    <div>
+        <h3 class="section-title-text">Đề thi của bạn</h3>
+        <p class="section-sub-count">3 đề thi đang khả dụng</p>
+    </div>
+    <div class="section-icon-btn">
+        <i class="fa-solid fa-list-ul"></i>
+    </div>
+</div>
+
+<!-- 3. Thẻ Đề thi 1: TIẾNG ANH (Đề thi thực tế từ CSDL kết nối Phòng thi) -->
+<div class="figma-exam-card">
+    <div class="card-accent-bar card-accent-purple"></div>
+    <div class="card-header-flex">
+        <div class="subject-icon-avatar avatar-purple">EN</div>
+        <div class="card-text-block">
+            <div class="subject-category-row">
+                <span class="category-label cat-purple">Tiếng Anh</span>
+                <span class="badge-open-tag">Đang mở</span>
+            </div>
+            <h4 class="exam-title-h4">@(activeExam?.Name ?? "TOEIC READING TEST - TEST 4 (Questions 101-200)")</h4>
+            <p class="exam-code-sub">Mã đề: TA12-CK1 · Khối 12</p>
+        </div>
+    </div>
+
+    <div class="card-facts-row">
+        <div class="fact-item">
+            <i class="fa-regular fa-clock"></i>
+            <span>@(activeExam?.DurationInMinutes ?? 75) phút</span>
+        </div>
+        <div class="fact-item">
+            <i class="fa-regular fa-file-lines"></i>
+            <span>@(activeExam?.TotalQuestions ?? 100) câu</span>
+        </div>
+        <div class="fact-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>18/06/2025</span>
+        </div>
+    </div>
+
+    @if (activeExam != null)
+    {
+        <a href="@Url.Action("Room", "Student", new { id = activeExam.Id })" class="btn-card-primary">
+            <span>Bắt đầu làm bài</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+        </a>
+    }
+    else
+    {
+        <a href="@Url.Action("Room", "Student")" class="btn-card-primary">
+            <span>Bắt đầu làm bài</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+        </a>
+    }
+</div>
+
+<!-- 4. Thẻ Đề thi 2: TOÁN HỌC (Chuẩn giao diện Figma) -->
+<div class="figma-exam-card">
+    <div class="card-accent-bar card-accent-blue"></div>
+    <div class="card-header-flex">
+        <div class="subject-icon-avatar avatar-blue">Σ</div>
+        <div class="card-text-block">
+            <div class="subject-category-row">
+                <span class="category-label cat-blue">Toán học</span>
+            </div>
+            <h4 class="exam-title-h4">Khảo sát chất lượng Toán 11</h4>
+            <p class="exam-code-sub">Mã đề: TO11-KS2 · Khối 11</p>
+        </div>
+    </div>
+
+    <div class="card-facts-row">
+        <div class="fact-item">
+            <i class="fa-regular fa-clock"></i>
+            <span>60 phút</span>
+        </div>
+        <div class="fact-item">
+            <i class="fa-regular fa-file-lines"></i>
+            <span>35 câu</span>
+        </div>
+        <div class="fact-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>20/06/2025</span>
+        </div>
+    </div>
+
+    <a href="javascript:void(0)" class="btn-card-outline">
+        <span>Xem chi tiết</span>
+        <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+    </a>
+</div>
+
+<!-- 5. Thẻ Đề thi 3: VẬT LÝ (Chuẩn giao diện Figma) -->
+<div class="figma-exam-card">
+    <div class="card-accent-bar card-accent-orange"></div>
+    <div class="card-header-flex">
+        <div class="subject-icon-avatar avatar-orange">F</div>
+        <div class="card-text-block">
+            <div class="subject-category-row">
+                <span class="category-label cat-orange">Vật lý</span>
+            </div>
+            <h4 class="exam-title-h4">Ôn tập chương III – Vật lý 10</h4>
+            <p class="exam-code-sub">Mã đề: VL10-OT3 · Khối 10</p>
+        </div>
+    </div>
+
+    <div class="card-facts-row">
+        <div class="fact-item">
+            <i class="fa-regular fa-clock"></i>
+            <span>45 phút</span>
+        </div>
+        <div class="fact-item">
+            <i class="fa-regular fa-file-lines"></i>
+            <span>30 câu</span>
+        </div>
+        <div class="fact-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>25/06/2025</span>
+        </div>
+    </div>
+
+    <a href="javascript:void(0)" class="btn-card-outline">
+        <span>Xem chi tiết</span>
+        <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+    </a>
+</div>

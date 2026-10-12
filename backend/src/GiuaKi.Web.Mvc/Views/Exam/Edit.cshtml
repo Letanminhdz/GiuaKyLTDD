@@ -1,0 +1,316 @@
+@model GiuaKi.Exams.ExamWithQuestionsDto
+@{
+    ViewBag.Title = "Chỉnh sửa đề thi - EduTest Admin";
+    var errorMsg = TempData["Error"] as string;
+    var successMsg = TempData["Success"] as string;
+}
+
+<style>
+    .page-header-block {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .btn-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #FFFFFF;
+        border: 1px solid var(--border-color);
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text-main);
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-back-link:hover {
+        background: #F8FAFC;
+    }
+
+    .question-editor-card {
+        background: #FFFFFF;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .question-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #F1F5F9;
+    }
+
+    .q-number-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 6px;
+    }
+
+    .correct-ans-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #D1FAE5;
+        color: #059669;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 6px;
+    }
+
+    .passage-box {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-left: 4px solid var(--primary);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 18px;
+    }
+
+    .passage-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .form-group-custom {
+        margin-bottom: 16px;
+    }
+
+    .form-label-custom {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+    .form-input-custom {
+        width: 100%;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-family: inherit;
+        color: var(--text-main);
+        transition: border-color 0.15s;
+    }
+
+    .form-input-custom:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(90, 79, 207, 0.1);
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .option-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .opt-letter-tag {
+        width: 32px;
+        height: 38px;
+        background: #F1F5F9;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .q-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 14px;
+        border-top: 1px solid #F1F5F9;
+    }
+
+    .btn-save-q {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--primary);
+        color: #FFFFFF;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .btn-save-q:hover {
+        background: var(--primary-hover);
+    }
+</style>
+
+<div class="page-header-block">
+    <div>
+        <h1 class="page-title">Rà soát & Chỉnh sửa đề thi</h1>
+        <p class="page-subtitle">@Model.Name · Thời gian: @Model.DurationInMinutes phút · @Model.Questions.Count câu hỏi</p>
+    </div>
+    <a href="@Url.Action("Index", "Exam")" class="btn-back-link">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Về trang Import</span>
+    </a>
+</div>
+
+@if (!string.IsNullOrEmpty(successMsg))
+{
+    <div style="background: #D1FAE5; color: #065F46; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500;">
+        <i class="fa-solid fa-circle-check" style="margin-right: 6px;"></i> @successMsg
+    </div>
+}
+
+<!-- Thẻ chỉnh sửa tên đề thi và thời lượng -->
+<div class="question-editor-card" style="border-left: 5px solid var(--primary);">
+    <div class="question-card-header">
+        <span class="q-number-pill">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>Thông tin chung đề thi</span>
+        </span>
+        <span style="font-size: 12px; color: var(--text-muted);">Mã đề: EXAM-@Model.Id</span>
+    </div>
+    <form method="post" action="@Url.Action("UpdateExamInfo", "Exam")">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 16px; align-items: flex-end;">
+            <div class="form-group-custom" style="margin-bottom: 0;">
+                <label class="form-label-custom">Tên / Tiêu đề đề thi</label>
+                <input type="text" name="name" class="form-input-custom" value="@Model.Name" required />
+            </div>
+            <div class="form-group-custom" style="margin-bottom: 0;">
+                <label class="form-label-custom">Thời lượng làm bài (phút)</label>
+                <input type="number" name="durationInMinutes" class="form-input-custom" value="@Model.DurationInMinutes" min="1" required />
+            </div>
+            <div>
+                <button type="submit" class="btn-save-q" style="height: 42px;">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Lưu tên đề</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.Questions != null && Model.Questions.Any())
+{
+    @for (int i = 0; i < Model.Questions.Count; i++)
+    {
+        var q = Model.Questions[i];
+        <div class="question-editor-card">
+            <div class="question-card-header">
+                <span class="q-number-pill">
+                    <i class="fa-regular fa-circle-question"></i>
+                    Câu @q.QuestionNumber
+                </span>
+                <span class="correct-ans-pill">
+                    <i class="fa-solid fa-check"></i>
+                    Đáp án đúng: @q.CorrectAnswer
+                </span>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(q.PassageText))
+            {
+                <div class="passage-box">
+                    <div class="passage-title">Đoạn văn đọc hiểu (Passage)</div>
+                    <div style="font-size: 13.5px; line-height: 1.6; color: #334155; white-space: pre-wrap;">@q.PassageText</div>
+                </div>
+            }
+
+            <form asp-controller="Exam" asp-action="UpdateQuestion" method="post">
+                <input type="hidden" name="Id" value="@q.Id" />
+                <input type="hidden" name="examId" value="@Model.Id" />
+
+                <div class="form-group-custom">
+                    <label class="form-label-custom">Nội dung câu hỏi:</label>
+                    <textarea name="Content" rows="2" class="form-input-custom" required>@q.Content</textarea>
+                </div>
+
+                <div class="options-grid">
+                    <div class="option-input-wrapper">
+                        <span class="opt-letter-tag">A</span>
+                        <input type="text" name="OptionA" value="@q.OptionA" class="form-input-custom" required />
+                    </div>
+                    <div class="option-input-wrapper">
+                        <span class="opt-letter-tag">B</span>
+                        <input type="text" name="OptionB" value="@q.OptionB" class="form-input-custom" required />
+                    </div>
+                    <div class="option-input-wrapper">
+                        <span class="opt-letter-tag">C</span>
+                        <input type="text" name="OptionC" value="@q.OptionC" class="form-input-custom" required />
+                    </div>
+                    <div class="option-input-wrapper">
+                        <span class="opt-letter-tag">D</span>
+                        <input type="text" name="OptionD" value="@q.OptionD" class="form-input-custom" required />
+                    </div>
+                </div>
+
+                <div class="q-card-footer">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label class="form-label-custom" style="margin: 0;">Chọn đáp án đúng:</label>
+                        <select name="CorrectAnswer" class="form-input-custom" style="width: 100px; padding: 6px 10px;">
+                            <!option value="A" @(q.CorrectAnswer == "A" ? "selected" : "")>A</!option>
+                            <!option value="B" @(q.CorrectAnswer == "B" ? "selected" : "")>B</!option>
+                            <!option value="C" @(q.CorrectAnswer == "C" ? "selected" : "")>C</!option>
+                            <!option value="D" @(q.CorrectAnswer == "D" ? "selected" : "")>D</!option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-save-q">
+                        <i class="fa-regular fa-floppy-disk"></i>
+                        <span>Lưu thay đổi</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+}
+else
+{
+    <div class="question-editor-card" style="text-align: center; padding: 48px;">
+        <p style="color: var(--text-muted);">Đề thi này chưa có câu hỏi nào.</p>
+    </div>
+}
